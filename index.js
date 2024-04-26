@@ -5,7 +5,7 @@
 require('dotenv').config();
 var express = require('express');
 var app = express();
-
+const getUserAgent = require('ua-parser-js');
 // enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
 // so that your API is remotely testable by FCC
 var cors = require('cors');
@@ -23,6 +23,21 @@ app.get('/', function (req, res) {
 app.get('/api/hello', function (req, res) {
   res.json({ greeting: 'hello API' });
 });
+
+
+app.get('/api/whoami',(req,res)=>{
+  const ipAddress = req.ip;
+  const userAgent = req.headers['user-agent'];
+  const parsedUserAgent = getUserAgent(userAgent);
+
+  const responseObject = {
+    ipaddress: ipAddress,
+    language: parsedUserAgent.language || 'en-US', // Fallback to 'en-US' if language is not detected
+    software: `${parsedUserAgent.browser.name} ${parsedUserAgent.browser.version}`
+  };
+
+  res.json(responseObject);
+})
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT || 3000, function () {
